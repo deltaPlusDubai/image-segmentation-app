@@ -1,5 +1,10 @@
 "use client";
 
+import { detectFaces, setupFaceDetection } from "@/app/utils/faceDetection";
+import {
+  initializeSegmentation,
+  loadMediaPipeScript,
+} from "@/app/utils/segmentation";
 import { FaceDetector } from "@mediapipe/tasks-vision";
 import {
   Dispatch,
@@ -8,11 +13,6 @@ import {
   useEffect,
   useState,
 } from "react";
-import { detectFaces, setupFaceDetection } from "@/app/utils/faceDetection";
-import {
-  initializeSegmentation,
-  loadMediaPipeScript,
-} from "@/app/utils/segementations";
 
 interface VideoCanvasComponentProps {
   videoRef: RefObject<HTMLVideoElement | null>;
