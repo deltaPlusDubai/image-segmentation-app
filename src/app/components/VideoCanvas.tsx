@@ -1,40 +1,38 @@
 "use client";
 
-import { detectFaces, setupFaceDetection } from "@/app/utils/faceDetection";
 import {
   initializeSegmentation,
   loadMediaPipeScript,
 } from "@/app/utils/segmentation";
-import { FaceDetector } from "@mediapipe/tasks-vision";
 import {
   Dispatch,
   RefObject,
   SetStateAction,
-  useEffect,
-  useState,
+  useEffect
 } from "react";
 
 interface VideoCanvasComponentProps {
   videoRef: RefObject<HTMLVideoElement | null>;
   canvasRefSegmentation: RefObject<HTMLCanvasElement | null>;
-  canvasRefFaceDetection: RefObject<HTMLCanvasElement | null>;
+  // canvasRefFaceDetection: RefObject<HTMLCanvasElement | null>;
   setIsLoading: Dispatch<SetStateAction<boolean>>;
 }
 
 export default function VideoCanvasComponent({
   videoRef,
   canvasRefSegmentation,
-  canvasRefFaceDetection,
+  // canvasRefFaceDetection,
   setIsLoading,
 }: VideoCanvasComponentProps) {
-  const [faceDetector, setFaceDetector] = useState<FaceDetector | null>(null);
+  // const [faceDetector, setFaceDetector] = useState<FaceDetector | null>(null);
   const resolution = { width: 1280, height: 720 };
 
   useEffect(() => {
     loadMediaPipeScript().then(() => {
       initializeSegmentation(videoRef, canvasRefSegmentation, resolution).then(
         () => {
-          setupFaceDetection(setFaceDetector).then(() => setIsLoading(false));
+          // setupFaceDetection(setFaceDetector).then(() => );
+          setIsLoading(false);
         }
       );
     });
@@ -47,28 +45,28 @@ export default function VideoCanvasComponent({
     };
   }, []);
 
-  useEffect(() => {
-    const videoElement = videoRef.current;
+  // useEffect(() => {
+  //   const videoElement = videoRef.current;
 
-    const onLoadedData = () => {
-      console.log("Video data loaded");
-      if (faceDetector) {
-        detectFaces(
-          performance.now(),
-          faceDetector,
-          canvasRefFaceDetection,
-          videoRef
-        );
-      }
-    };
+  //   const onLoadedData = () => {
+  //     console.log("Video data loaded");
+  //     if (faceDetector) {
+  //       detectFaces(
+  //         performance.now(),
+  //         faceDetector,
+  //         canvasRefFaceDetection,
+  //         videoRef
+  //       );
+  //     }
+  //   };
 
-    if (videoElement) {
-      videoElement.addEventListener("loadeddata", onLoadedData);
-      return () => {
-        videoElement.removeEventListener("loadeddata", onLoadedData);
-      };
-    }
-  }, [faceDetector]);
+  //   if (videoElement) {
+  //     videoElement.addEventListener("loadeddata", onLoadedData);
+  //     return () => {
+  //       videoElement.removeEventListener("loadeddata", onLoadedData);
+  //     };
+  //   }
+  // }, [faceDetector]);
 
   return (
     <div className="relative">
@@ -77,10 +75,10 @@ export default function VideoCanvasComponent({
         ref={canvasRefSegmentation}
         className="absolute z-0 top-0 left-0 w-full h-full object-cover"
       />
-      <canvas
+      {/* <canvas
         ref={canvasRefFaceDetection}
         className="absolute z-10 top-0 left-0 w-full h-full object-cover"
-      />
+      /> */}
     </div>
   );
 }

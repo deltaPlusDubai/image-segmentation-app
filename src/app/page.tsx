@@ -9,41 +9,51 @@ import VideoCanvasComponent from "./components/VideoCanvas";
 export default function Home() {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const canvasRefSegmentation = useRef<HTMLCanvasElement | null>(null);
-  const canvasRefFaceDetection = useRef<HTMLCanvasElement | null>(null);
+  // const canvasRefFaceDetection = useRef<HTMLCanvasElement | null>(null);
   const [capturedImage, setCapturedImage] = useState<string | null>(null);
   const [isFormOpen, setIsFormOpen] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [formData, setFormData] = useState({ name: "", email: "" });
 
   const captureImage = () => {
-    const segmentationCanvas = canvasRefSegmentation.current;
-    const faceDetectionCanvas = canvasRefFaceDetection.current;
+    const canvas = canvasRefSegmentation.current;
+    if (!canvas) return;
 
-    if (!segmentationCanvas || !faceDetectionCanvas) return;
-
-    // Create a temporary canvas to combine both canvases
-    const tempCanvas = document.createElement("canvas");
-    const tempCtx = tempCanvas.getContext("2d");
-
-    if (!tempCtx) return;
-
-    // Set the size of the temporary canvas
-    tempCanvas.width = segmentationCanvas.width;
-    tempCanvas.height = segmentationCanvas.height;
-
-    // Draw the segmentation canvas first
-    tempCtx.drawImage(segmentationCanvas, 0, 0);
-
-    // Overlay the face detection canvas
-    tempCtx.drawImage(faceDetectionCanvas, 0, 0);
-
-    // Export the combined image as a Data URL
-    const combinedImage = tempCanvas.toDataURL("image/png");
-
-    // Set the combined image for preview
-    setCapturedImage(combinedImage);
+    const image = canvas.toDataURL("image/png");
+    setCapturedImage(image); // Set the captured image for preview
     setIsFormOpen(true);
   };
+
+  // const captureImage = () => {
+  //   const segmentationCanvas = canvasRefSegmentation.current;
+  //   // const faceDetectionCanvas = canvasRefFaceDetection.current;
+
+  //   if (!segmentationCanvas || !faceDetectionCanvas) return;
+
+  //   // Create a temporary canvas to combine both canvases
+  //   const tempCanvas = document.createElement("canvas");
+  //   const tempCtx = tempCanvas.getContext("2d");
+
+  //   if (!tempCtx) return;
+
+  //   // Set the size of the temporary canvas
+  //   tempCanvas.width = segmentationCanvas.width;
+  //   tempCanvas.height = segmentationCanvas.height;
+
+  //   // Draw the segmentation canvas first
+  //   tempCtx.drawImage(segmentationCanvas, 0, 0);
+
+  //   // Overlay the face detection canvas
+  //   tempCtx.drawImage(faceDetectionCanvas, 0, 0);
+
+  //   // Export the combined image as a Data URL
+  //   const combinedImage = tempCanvas.toDataURL("image/png");
+
+  //   // Set the combined image for preview
+  //   setCapturedImage(combinedImage);
+  //   setIsFormOpen(true);
+  // };
+
   const closeModal = () => {
     setCapturedImage(null);
     setIsFormOpen(false);
@@ -59,7 +69,7 @@ export default function Home() {
         <VideoCanvasComponent
           videoRef={videoRef}
           canvasRefSegmentation={canvasRefSegmentation}
-          canvasRefFaceDetection={canvasRefFaceDetection}
+          // canvasRefFaceDetection={canvasRefFaceDetection}
           setIsLoading={setIsLoading}
         />
       </div>
