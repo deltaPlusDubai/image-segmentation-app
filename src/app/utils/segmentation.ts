@@ -24,6 +24,9 @@ export async function initializeSegmentation(
   const crownImage = new Image();
   crownImage.src = "/crown-2.png";
 
+  const smileEmojiImage = new Image();
+  smileEmojiImage.src = "/smile-emoji.png";
+
   holistic.setOptions({
     modelComplexity: 1,
     smoothLandmarks: true,
@@ -134,6 +137,24 @@ export async function initializeSegmentation(
       }
     }
 
+    canvasCtx.globalCompositeOperation = "source-over";
+
+    // Smile Detection Logic
+    if (results.faceLandmarks && isSmiling(results.faceLandmarks)) {
+      const headLandmark = results.poseLandmarks?.[0]; // Use nose as reference
+      if (headLandmark) {
+        const emojiWidth = 150; // Adjust emoji size
+        const emojiHeight = 150;
+        canvasCtx.drawImage(
+          smileEmojiImage,
+          headLandmark.x * canvasElement!.width - emojiWidth / 2,
+          headLandmark.y * canvasElement!.height - emojiHeight - 250,
+          emojiWidth,
+          emojiHeight
+        );
+      }
+    }
+
     canvasCtx.restore();
   });
 
@@ -156,6 +177,22 @@ export async function initializeSegmentation(
     .catch((err) => {
       console.error("Error accessing camera:", err);
     });
+}
+
+function isSmiling(landmarks: any) {
+  const leftMouthCorner = landmarks[61]; // Left mouth corner
+  const rightMouthCorner = landmarks[291]; // Right mouth corner
+  const topLip = landmarks[13]; // Top lip
+  const bottomLip = landmarks[14]; // Bottom lip
+
+  const mouthWidth = Math.abs(rightMouthCorner.x - leftMouthCorner.x);
+  const mouthHeight = Math.abs(topLip.y - bottomLip.y);
+
+  // Adjust thresholds based on testing
+  const smileRatio = mouthWidth / mouthHeight;
+
+  // A typical smile has a width-to-height ratio above 2.5
+  return smileRatio > 0.5 && mouthHeight > 0.015; // Adjust mouthHeight threshold if needed
 }
 
 // Helper function to detect thumbs-up gesture
