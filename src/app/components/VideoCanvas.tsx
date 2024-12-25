@@ -4,37 +4,29 @@ import {
   initializeSegmentation,
   loadMediaPipeScript,
 } from "@/app/utils/segmentation";
-import {
-  Dispatch,
-  RefObject,
-  SetStateAction,
-  useEffect
-} from "react";
+import { Dispatch, RefObject, SetStateAction, useEffect } from "react";
 
 interface VideoCanvasComponentProps {
   videoRef: RefObject<HTMLVideoElement | null>;
   canvasRefSegmentation: RefObject<HTMLCanvasElement | null>;
-  // canvasRefFaceDetection: RefObject<HTMLCanvasElement | null>;
   setIsLoading: Dispatch<SetStateAction<boolean>>;
 }
 
 export default function VideoCanvasComponent({
   videoRef,
   canvasRefSegmentation,
-  // canvasRefFaceDetection,
   setIsLoading,
 }: VideoCanvasComponentProps) {
-  // const [faceDetector, setFaceDetector] = useState<FaceDetector | null>(null);
   const resolution = { width: 1280, height: 720 };
 
   useEffect(() => {
     loadMediaPipeScript().then(() => {
-      initializeSegmentation(videoRef, canvasRefSegmentation, resolution).then(
-        () => {
-          // setupFaceDetection(setFaceDetector).then(() => );
+      console.log("Script loaded successfully");
+      initializeSegmentation(videoRef, canvasRefSegmentation, resolution)
+        .then(() => {
           setIsLoading(false);
-        }
-      );
+        })
+        .catch((err) => console.error("Script loading error:", err));
     });
 
     return () => {
@@ -45,40 +37,13 @@ export default function VideoCanvasComponent({
     };
   }, []);
 
-  // useEffect(() => {
-  //   const videoElement = videoRef.current;
-
-  //   const onLoadedData = () => {
-  //     console.log("Video data loaded");
-  //     if (faceDetector) {
-  //       detectFaces(
-  //         performance.now(),
-  //         faceDetector,
-  //         canvasRefFaceDetection,
-  //         videoRef
-  //       );
-  //     }
-  //   };
-
-  //   if (videoElement) {
-  //     videoElement.addEventListener("loadeddata", onLoadedData);
-  //     return () => {
-  //       videoElement.removeEventListener("loadeddata", onLoadedData);
-  //     };
-  //   }
-  // }, [faceDetector]);
-
   return (
-    <div className="relative">
+    <div className="relative w-full h-full">
       <video ref={videoRef} className="w-full h-full" />
       <canvas
         ref={canvasRefSegmentation}
         className="absolute z-0 top-0 left-0 w-full h-full object-cover"
       />
-      {/* <canvas
-        ref={canvasRefFaceDetection}
-        className="absolute z-10 top-0 left-0 w-full h-full object-cover"
-      /> */}
     </div>
   );
 }

@@ -12,10 +12,10 @@ export async function initializeSegmentation(
   const mpHolistic = window;
 
   const holistic = new (mpHolistic as any).Holistic({
-    locateFile: (file: any) =>
-      `https://cdn.jsdelivr.net/npm/@mediapipe/holistic@${
-        (mpHolistic as any).VERSION
-      }/${file}`,
+    locateFile: (file: any) => {
+      console.log("Loading file:", `/holistic/${file}`);
+      return `/holistic/${file}`;
+    },
   });
 
   const backgroundImage = new Image();
@@ -36,12 +36,6 @@ export async function initializeSegmentation(
     minDetectionConfidence: 0.8,
     minTrackingConfidence: 0.8,
   });
-
-  const drawConnectors = (window as any).drawConnectors;
-  const drawLandmarks = (window as any).drawLandmarks;
-  const POSE_CONNECTIONS = (window as any).POSE_CONNECTIONS;
-  const FACEMESH_TESSELATION = (window as any).FACEMESH_TESSELATION;
-  const HAND_CONNECTIONS = (window as any).HAND_CONNECTIONS;
 
   holistic.onResults((results: any) => {
     if (
@@ -86,36 +80,6 @@ export async function initializeSegmentation(
     );
 
     canvasCtx.globalCompositeOperation = "source-over";
-
-    // drawConnectors(canvasCtx, results.poseLandmarks, POSE_CONNECTIONS, {
-    //   color: "#00FF00",
-    //   lineWidth: 4,
-    // });
-    // drawLandmarks(canvasCtx, results.poseLandmarks, {
-    //   color: "#FF0000",
-    //   lineWidth: 2,
-    // });
-    // drawConnectors(canvasCtx, results.faceLandmarks, FACEMESH_TESSELATION, {
-    //   color: "#C0C0C070",
-    //   lineWidth: 1,
-    // });
-    // drawConnectors(canvasCtx, results.leftHandLandmarks, HAND_CONNECTIONS, {
-    //   color: "#CC0000",
-    //   lineWidth: 5,
-    // });
-    // drawLandmarks(canvasCtx, results.leftHandLandmarks, {
-    //   color: "#00FF00",
-    //   lineWidth: 2,
-    // });
-    // drawConnectors(canvasCtx, results.rightHandLandmarks, HAND_CONNECTIONS, {
-    //   color: "#00CC00",
-    //   lineWidth: 5,
-    // });
-    // drawLandmarks(canvasCtx, results.rightHandLandmarks, {
-    //   color: "#FF0000",
-    //   lineWidth: 2,
-    // });
-
     // Detect specific gesture (e.g., thumbs up gesture)
     if (
       (results.leftHandLandmarks && isThumbsUp(results.leftHandLandmarks)) ||
@@ -138,7 +102,6 @@ export async function initializeSegmentation(
     }
 
     canvasCtx.globalCompositeOperation = "source-over";
-
     // Smile Detection Logic
     if (results.faceLandmarks && isSmiling(results.faceLandmarks)) {
       const headLandmark = results.poseLandmarks?.[0]; // Use nose as reference
@@ -207,50 +170,10 @@ function isThumbsUp(landmarks: any): boolean {
 export async function loadMediaPipeScript() {
   return new Promise<void>((resolve, reject) => {
     const script = document.createElement("script");
-    script.src =
-      "https://cdn.jsdelivr.net/npm/@mediapipe/holistic@0.4/holistic.js";
+    script.src = "/holistic/holistic.js";
     script.async = true;
     script.onload = () => resolve();
     script.onerror = () => reject(new Error("Failed to load MediaPipe script"));
-    document.body.appendChild(script);
-  });
-}
-
-export async function loadMediaPipeScript_2() {
-  return new Promise<void>((resolve, reject) => {
-    const script = document.createElement("script");
-    script.src =
-      "https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js";
-    script.async = true;
-    script.onload = () => resolve();
-    script.onerror = () =>
-      reject(new Error("Failed to load Camera Utils script"));
-    document.body.appendChild(script);
-  });
-}
-
-export async function loadMediaPipeScript_3() {
-  return new Promise<void>((resolve, reject) => {
-    const script = document.createElement("script");
-    script.src =
-      "https://cdn.jsdelivr.net/npm/@mediapipe/control_utils/control_utils.js";
-    script.async = true;
-    script.onload = () => resolve();
-    script.onerror = () =>
-      reject(new Error("Failed to load Control Utils script"));
-    document.body.appendChild(script);
-  });
-}
-
-export async function loadMediaPipeScript_4() {
-  return new Promise<void>((resolve, reject) => {
-    const script = document.createElement("script");
-    script.src =
-      "https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js";
-    script.async = true;
-    script.onload = () => resolve();
-    script.onerror = () =>
-      reject(new Error("Failed to load Drawing Utils script"));
     document.body.appendChild(script);
   });
 }
