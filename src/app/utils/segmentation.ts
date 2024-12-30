@@ -1,7 +1,10 @@
+import { Dispatch, SetStateAction } from "react";
+
 export async function initializeSegmentation(
   videoRef: React.RefObject<HTMLVideoElement | null>,
   canvasRefSegmentation: React.RefObject<HTMLCanvasElement | null>,
-  resolution: { width: number; height: number }
+  resolution: { width: number; height: number },
+  setCameraDisabled: Dispatch<SetStateAction<boolean>>
 ) {
   const videoElement = videoRef.current;
   const canvasElement = canvasRefSegmentation.current;
@@ -138,6 +141,7 @@ export async function initializeSegmentation(
       sendFrame();
     })
     .catch((err) => {
+      setCameraDisabled(true);
       console.error("Error accessing camera:", err);
     });
 }

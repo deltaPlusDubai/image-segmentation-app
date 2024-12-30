@@ -20,6 +20,8 @@ const createWindow = () => {
     webPreferences: {
       preload: join(__dirname, "preload.js"),
     },
+    autoHideMenuBar: true,
+    fullscreen: true,
   });
 
   if (app.isPackaged) {

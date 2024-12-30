@@ -1,12 +1,48 @@
 appId: "com.delta.ascenda"
 productName: "Ascenda App"
 copyright: "Copyright (c) 2025 Delta Plus Event Management"
+
+# Enable asar to compress the app contents
+asar: true 
+
 win:
-  target: ["dir", "portable", "zip"]
+  target:
+    - dir
+    - portable
+    - zip
   icon: "resources/icon.ico"
+  compression: maximum # High compression for Windows targets
+
 linux:
-  target: ["dir", "appimage", "zip"]
+  target:
+    - dir
+    - appimage
+    - zip
   icon: "resources/icon.png"
+  compression: maximum # High compression for Linux targets
+
 mac:
-  target: ["dir", "dmg", "zip"]
+  target:
+    - dir
+    - dmg
+    - zip
   icon: "resources/icon.icns"
+  compression: maximum # High compression for macOS targets
+
+# Exclude source maps and devDependencies from the final build
+files:
+  - "**/*"
+  - "!**/*.map" # Exclude source maps
+  - "!node_modules/**/*.map" # Exclude maps from dependencies
+  - "!node_modules/.cache/**/*" # Exclude cache files
+  - "!src/**/*.test.js" # Exclude test files if applicable
+
+# Optimize dependency tree for production
+extraMetadata:
+  devDependencies:
+    electron: undefined
+
+# # NSIS Compression for Windows installers
+# nsis:
+#   artifactName: "${productName}-Setup-${version}.${ext}"
+#   compression: maximum

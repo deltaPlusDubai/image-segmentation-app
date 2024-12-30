@@ -13,6 +13,7 @@ export default function Home() {
   const [isFormOpen, setIsFormOpen] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [formData, setFormData] = useState({ name: "", email: "" });
+  const [cameraDisabled, setCameraDisabled] = useState(false);
 
   const captureImage = () => {
     const canvas = canvasRefSegmentation.current;
@@ -32,15 +33,26 @@ export default function Home() {
     <>
       {isLoading ? <LoadingSpinner /> : <></>}
 
-      <div className={`w-full h-full ${isLoading ? "hidden absolute" : ""}`}>
-        <CaptureButton onClick={() => captureImage()} />
+      {cameraDisabled ? (
+        <div className="flex w-full h-full justify-center items-center">
+          <h1>Camera is disabled!</h1>
+        </div>
+      ) : (
+        <>
+          <div
+            className={`w-full h-full ${isLoading ? "hidden absolute" : ""}`}
+          >
+            <CaptureButton onClick={() => captureImage()} />
 
-        <VideoCanvasComponent
-          videoRef={videoRef}
-          canvasRefSegmentation={canvasRefSegmentation}
-          setIsLoading={setIsLoading}
-        />
-      </div>
+            <VideoCanvasComponent
+              videoRef={videoRef}
+              canvasRefSegmentation={canvasRefSegmentation}
+              setIsLoading={setIsLoading}
+              setCameraDisabled={setCameraDisabled}
+            />
+          </div>
+        </>
+      )}
 
       <ModalForm
         image={capturedImage}

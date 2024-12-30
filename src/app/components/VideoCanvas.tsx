@@ -10,19 +10,26 @@ interface VideoCanvasComponentProps {
   videoRef: RefObject<HTMLVideoElement | null>;
   canvasRefSegmentation: RefObject<HTMLCanvasElement | null>;
   setIsLoading: Dispatch<SetStateAction<boolean>>;
+  setCameraDisabled: Dispatch<SetStateAction<boolean>>;
 }
 
 export default function VideoCanvasComponent({
   videoRef,
   canvasRefSegmentation,
   setIsLoading,
+  setCameraDisabled,
 }: VideoCanvasComponentProps) {
   const resolution = { width: 1280, height: 720 };
 
   useEffect(() => {
     loadMediaPipeScript().then(() => {
       console.log("Script loaded successfully");
-      initializeSegmentation(videoRef, canvasRefSegmentation, resolution)
+      initializeSegmentation(
+        videoRef,
+        canvasRefSegmentation,
+        resolution,
+        setCameraDisabled
+      )
         .then(() => {
           setIsLoading(false);
         })
