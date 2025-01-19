@@ -44,6 +44,19 @@ export default function Home() {
           >
             <CaptureButton onClick={() => captureImage()} />
 
+            <img
+              className="z-20 absolute bottom-[2rem] right-[2rem] mr-3 w-[15rem]"
+              src="/ascenda/logo.png"
+              alt="Ascenda Logo"
+            />
+
+            {/* <video
+              src="/ascenda/particles.mp4"
+              autoPlay
+              loop
+              className="h-full w-full object-cover"
+            ></video> */}
+
             <VideoCanvasComponent
               videoRef={videoRef}
               canvasRefSegmentation={canvasRefSegmentation}

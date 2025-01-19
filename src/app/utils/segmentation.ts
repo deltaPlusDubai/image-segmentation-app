@@ -22,13 +22,13 @@ export async function initializeSegmentation(
   });
 
   const backgroundImage = new Image();
-  backgroundImage.src = "/custom-bg.jpg";
+  backgroundImage.src = "/ascenda/bg.webp";
 
-  const crownImage = new Image();
-  crownImage.src = "/crown-2.png";
+  const scaleImg = new Image();
+  scaleImg.src = "/ascenda/scale.png";
 
-  const smileEmojiImage = new Image();
-  smileEmojiImage.src = "/smile-emoji.png";
+  // const ascendaNestleLogo = new Image();
+  // ascendaNestleLogo.src = "/ascenda/logo.png";
 
   holistic.setOptions({
     modelComplexity: 1,
@@ -83,43 +83,69 @@ export async function initializeSegmentation(
     );
 
     canvasCtx.globalCompositeOperation = "source-over";
-    // Detect specific gesture (e.g., thumbs up gesture)
-    if (
-      (results.leftHandLandmarks && isThumbsUp(results.leftHandLandmarks)) ||
-      (results.rightHandLandmarks && isThumbsUp(results.rightHandLandmarks))
-    ) {
-      console.log("thumbs up detected....");
-      // Get head coordinates
-      const headLandmark = results.poseLandmarks?.[0]; // Nose
-      if (headLandmark) {
-        const crownWidth = 500; // Adjust crown size
-        const crownHeight = 450;
+
+    // Ensure pose landmarks are detected and draw the tracked image
+    if (results.poseLandmarks) {
+      const nose = results.poseLandmarks?.[0]; // Nose landmark (top of the head)
+      const leftHip = results.poseLandmarks?.[23]; // Left hip landmark
+      const leftShoulder = results.poseLandmarks?.[11]; // Left shoulder landmark
+
+      if (nose && leftHip && leftShoulder) {
+        // Calculate the height dynamically from head to waist
+        const headToWaistHeight = (leftHip.y - nose.y) * canvasElement!.height;
+
+        // Set dynamic image size
+        const scaleWidth = canvasElement!.width * 0.06; // Adjusted width for a better fit
+        const scaleHeight = headToWaistHeight; // Height matches head to waist span
+
+        // Position image on the left side of the canvas
+        const offsetX =
+          leftShoulder.x * canvasElement!.width - scaleWidth * 2.6; // Adjust left shift
+        const offsetY = nose.y * canvasElement!.height - 50; // Slightly above the top of the head
+
+        // Draw the image
         canvasCtx.drawImage(
-          crownImage,
-          headLandmark.x * canvasElement!.width - crownWidth / 2,
-          headLandmark.y * canvasElement!.height - crownHeight - 100,
-          crownWidth,
-          crownHeight
+          scaleImg,
+          offsetX,
+          offsetY,
+          scaleWidth,
+          scaleHeight
         );
       }
     }
 
-    canvasCtx.globalCompositeOperation = "source-over";
-    // Smile Detection Logic
-    if (results.faceLandmarks && isSmiling(results.faceLandmarks)) {
-      const headLandmark = results.poseLandmarks?.[0]; // Use nose as reference
-      if (headLandmark) {
-        const emojiWidth = 150; // Adjust emoji size
-        const emojiHeight = 150;
-        canvasCtx.drawImage(
-          smileEmojiImage,
-          headLandmark.x * canvasElement!.width - emojiWidth / 2,
-          headLandmark.y * canvasElement!.height - emojiHeight - 250,
-          emojiWidth,
-          emojiHeight
-        );
-      }
-    }
+    // canvasCtx.globalCompositeOperation = "source-over";
+    // // Add static company logo on the bottom-right corner
+    // const logoWidth = canvasElement!.width * 0.15; // Set logo width to 15% of canvas width
+    // const logoHeight = canvasElement!.height * 0.1; // Set logo height to 10% of canvas height
+    // const logoOffsetX = canvasElement!.width - logoWidth - 50; // 20px padding from the right edge
+    // const logoOffsetY = canvasElement!.height - logoHeight - 40; // 20px padding from the bottom edge
+
+    // // Draw the company logo
+    // canvasCtx.drawImage(
+    //   ascendaNestleLogo, // The image object for your company logo
+    //   logoOffsetX,
+    //   logoOffsetY,
+    //   logoWidth,
+    //   logoHeight
+    // );
+
+    // canvasCtx.globalCompositeOperation = "source-over";
+    // // Smile Detection Logic
+    // if (results.faceLandmarks && isSmiling(results.faceLandmarks)) {
+    // const headLandmark = results.poseLandmarks?.[0]; // Use nose as reference
+    // if (headLandmark) {
+    //   const emojiWidth = 150; // Adjust emoji size
+    //   const emojiHeight = 150;
+    //   canvasCtx.drawImage(
+    //     smileEmojiImage,
+    //     headLandmark.x * canvasElement!.width - emojiWidth / 2,
+    //     headLandmark.y * canvasElement!.height - emojiHeight - 250,
+    //     emojiWidth,
+    //     emojiHeight
+    //   );
+    // }
+    // }
 
     canvasCtx.restore();
   });
@@ -146,29 +172,29 @@ export async function initializeSegmentation(
     });
 }
 
-function isSmiling(landmarks: any) {
-  const leftMouthCorner = landmarks[61]; // Left mouth corner
-  const rightMouthCorner = landmarks[291]; // Right mouth corner
-  const topLip = landmarks[13]; // Top lip
-  const bottomLip = landmarks[14]; // Bottom lip
+// function isSmiling(landmarks: any) {
+//   const leftMouthCorner = landmarks[61]; // Left mouth corner
+//   const rightMouthCorner = landmarks[291]; // Right mouth corner
+//   const topLip = landmarks[13]; // Top lip
+//   const bottomLip = landmarks[14]; // Bottom lip
 
-  const mouthWidth = Math.abs(rightMouthCorner.x - leftMouthCorner.x);
-  const mouthHeight = Math.abs(topLip.y - bottomLip.y);
+//   const mouthWidth = Math.abs(rightMouthCorner.x - leftMouthCorner.x);
+//   const mouthHeight = Math.abs(topLip.y - bottomLip.y);
 
-  // Adjust thresholds based on testing
-  const smileRatio = mouthWidth / mouthHeight;
+//   // Adjust thresholds based on testing
+//   const smileRatio = mouthWidth / mouthHeight;
 
-  // A typical smile has a width-to-height ratio above 2.5
-  return smileRatio > 0.5 && mouthHeight > 0.015; // Adjust mouthHeight threshold if needed
-}
+//   // A typical smile has a width-to-height ratio above 2.5
+//   return smileRatio > 0.5 && mouthHeight > 0.015; // Adjust mouthHeight threshold if needed
+// }
 
-// Helper function to detect thumbs-up gesture
-function isThumbsUp(landmarks: any): boolean {
-  // Define thumb-tip and index-tip positions
-  const thumbTip = landmarks[4];
-  const indexTip = landmarks[8];
-  return thumbTip.y < indexTip.y; // Thumb is above the index finger
-}
+// // Helper function to detect thumbs-up gesture
+// function isThumbsUp(landmarks: any): boolean {
+//   // Define thumb-tip and index-tip positions
+//   const thumbTip = landmarks[4];
+//   const indexTip = landmarks[8];
+//   return thumbTip.y < indexTip.y; // Thumb is above the index finger
+// }
 
 // Selfie Segmentation
 export async function loadMediaPipeScript() {
